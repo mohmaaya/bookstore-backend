@@ -1,0 +1,11 @@
+server:
+  port: 8080
+spring:
+  jpa:
+    open-in-view: false
+    defer-datasource-initialization: true
+  h2:
+    console:
+      enabled: true
+  datasource:
+    generate-unique-name: false
