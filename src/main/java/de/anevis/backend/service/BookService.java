@@ -1,11 +1,12 @@
 package de.anevis.backend.service;
 
+import de.anevis.backend.domain.*;
 import de.anevis.backend.exception.BookNotFoundException;
 import de.anevis.backend.exception.DuplicateBookException;
 import de.anevis.backend.repository.BookRepository;
-import de.anevis.backend.domain.Book;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,13 +14,30 @@ import java.util.Optional;
 public class BookService {
 
 	private final BookRepository bookRepository;
+	private final SenderBookDTOMapper senderBookDTOMapper;
 
-	public BookService(BookRepository bookRepository) {
+	public BookService(BookRepository bookRepository, SenderBookDTOMapper senderBookDTOMapper) {
 		this.bookRepository = bookRepository;
+		this.senderBookDTOMapper = senderBookDTOMapper;
 	}
 
-	public List<Book> findAll() {
-		return bookRepository.findAll();
+	public SenderBookDTO findAllBooks(){
+		List<Book> books = bookRepository.noCursorFindBooks();
+		return senderBookDTOMapper.apply(books,10, Collections.emptyList(), Collections.emptyList());
+	}
+
+	public SenderBookDTO findBooksNextPage(String nextCursor, int limit){
+		long cursorId = CursorEncode.decodeCursor(nextCursor);
+		List<Book> nextPageBooks = bookRepository.nextPageFindBooks(cursorId, limit+1);
+		List<Book> previousPageBooks = bookRepository.previousPageFindBooks(cursorId,limit);
+		return senderBookDTOMapper.apply(nextPageBooks, limit, nextPageBooks, previousPageBooks);
+	}
+
+	public SenderBookDTO findBooksPreviousPage(String nextCursor, int limit){
+		long cursorId = CursorEncode.decodeCursor(nextCursor);
+		List<Book> nextPageBooks = bookRepository.nextPageFindBooks(cursorId, limit+1);
+		List<Book> previousPageBooks = bookRepository.previousPageFindBooks(cursorId,limit);
+		return senderBookDTOMapper.apply(previousPageBooks, limit, nextPageBooks, previousPageBooks);
 	}
 
 	public Book updateBook(Long bookId, Book updatedBook) {

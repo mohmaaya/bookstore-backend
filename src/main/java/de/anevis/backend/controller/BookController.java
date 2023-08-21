@@ -1,15 +1,14 @@
 package de.anevis.backend.controller;
 
 import de.anevis.backend.domain.Book;
+
+import de.anevis.backend.domain.SenderBookDTO;
 import de.anevis.backend.exception.BookNotFoundException;
 import de.anevis.backend.exception.DuplicateBookException;
 import de.anevis.backend.service.BookService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/books")
@@ -22,15 +21,43 @@ public class BookController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Book>> findAllBooks() {
+    public ResponseEntity<SenderBookDTO> findAllBooks() {
         try {
-            List<Book> books = bookService.findAll();
-            return ResponseEntity.ok(books);
+            SenderBookDTO bookDTO = bookService.findAllBooks();
+            return ResponseEntity.ok(bookDTO);
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @GetMapping("/previouspage")
+    public ResponseEntity<SenderBookDTO> findBooksPreviousPage(
+            @RequestParam("cursor") String cursor,
+            @RequestParam("limit") int limit
+    ) {
+        try {
+            SenderBookDTO bookDTO = bookService.findBooksPreviousPage(cursor, limit);
+            return ResponseEntity.ok(bookDTO);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/nextpage")
+    public ResponseEntity<SenderBookDTO> findBooksNextPage(
+            @RequestParam("cursor") String cursor,
+            @RequestParam("limit") int limit
+    ) {
+        try {
+            SenderBookDTO bookDTO = bookService.findBooksNextPage(cursor, limit);
+            return ResponseEntity.ok(bookDTO);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 
     @PostMapping
     public ResponseEntity<?> addBook(@RequestBody Book book) {
