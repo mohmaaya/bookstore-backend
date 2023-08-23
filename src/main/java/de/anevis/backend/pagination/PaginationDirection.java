@@ -1,4 +1,4 @@
-package de.anevis.backend.domain;
+package de.anevis.backend.pagination;
 
 public enum PaginationDirection {
     NEXT_PAGE("next"),

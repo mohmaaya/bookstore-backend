@@ -1,4 +1,4 @@
-package de.anevis.backend.domain;
+package de.anevis.backend.pagination;
 
 import java.nio.ByteBuffer;
 import java.util.Base64;

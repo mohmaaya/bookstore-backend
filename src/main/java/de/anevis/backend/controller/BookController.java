@@ -1,8 +1,6 @@
 package de.anevis.backend.controller;
 
-import de.anevis.backend.domain.Book;
-
-import de.anevis.backend.domain.PaginationDirection;
+import de.anevis.backend.domain.ReceiverBookDTO;
 import de.anevis.backend.domain.SenderBookDTO;
 import de.anevis.backend.exception.BookNotFoundException;
 import de.anevis.backend.exception.DuplicateBookException;
@@ -47,9 +45,9 @@ public class BookController {
 
 
     @PostMapping
-    public ResponseEntity<?> addBook(@RequestBody Book book) {
+    public ResponseEntity<?> addBook(@RequestBody ReceiverBookDTO receiverBookDTO) {
         try {
-            Book addedBook = bookService.addBook(book);
+            SenderBookDTO addedBook = bookService.addBook(receiverBookDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(addedBook);
 
         } catch (DuplicateBookException e) {
@@ -61,9 +59,9 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateBook(@PathVariable("id") Long id, @RequestBody Book updatedBook) {
+    public ResponseEntity<?> updateBook(@PathVariable("id") Long id, @RequestBody ReceiverBookDTO receiverBookDTO) {
         try {
-            Book updated = bookService.updateBook(id, updatedBook);
+            SenderBookDTO updated = bookService.updateBook(id, receiverBookDTO);
                 return ResponseEntity.ok(updated);
 
         } catch (BookNotFoundException e) {
@@ -75,10 +73,15 @@ public class BookController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteBook(@PathVariable("id") Long id) {
+    public ResponseEntity<?> deleteBook(
+            @PathVariable("id") Long id,
+            @RequestParam("cursor") String cursor,
+            @RequestParam("limit") int limit,
+            @RequestParam("direction") String direction) {
+
         try {
-            bookService.deleteBook(id);
-            return ResponseEntity.noContent().build();
+            SenderBookDTO bookRemoval = bookService.deleteBook(id, cursor, limit, direction);
+            return ResponseEntity.ok(bookRemoval);
 
         } catch (BookNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

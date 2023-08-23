@@ -1,27 +1,23 @@
-package de.anevis.backend.domain;
+package de.anevis.backend.pagination;
 
 public class Cursors {
     private String nextCursor;
     private String previousCursor;
+    private String currentCursor;
 
-    public Cursors(String nextCursor, String previousCursor){
+    public Cursors(String nextCursor, String previousCursor, String currentCursor){
         this.nextCursor = nextCursor;
         this.previousCursor = previousCursor;
+        this.currentCursor = currentCursor;
     }
 
     public String getNextCursor() {
         return nextCursor;
     }
 
-    public void setNextCursor(String nextCursor) {
-        this.nextCursor = nextCursor;
-    }
-
-    public void setPreviousCursor(String previousCursor) {
-        this.previousCursor = previousCursor;
-    }
-
     public String getPreviousCursor() {
         return previousCursor;
     }
+
+    public String getCurrentCursor() { return currentCursor;}
 }
