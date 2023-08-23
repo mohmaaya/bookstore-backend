@@ -2,6 +2,7 @@ package de.anevis.backend.controller;
 
 import de.anevis.backend.domain.Book;
 
+import de.anevis.backend.domain.PaginationDirection;
 import de.anevis.backend.domain.SenderBookDTO;
 import de.anevis.backend.exception.BookNotFoundException;
 import de.anevis.backend.exception.DuplicateBookException;
@@ -30,27 +31,13 @@ public class BookController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    @GetMapping("/previouspage")
+    @GetMapping("/page")
     public ResponseEntity<SenderBookDTO> findBooksPreviousPage(
             @RequestParam("cursor") String cursor,
-            @RequestParam("limit") int limit
-    ) {
+            @RequestParam("limit") int limit,
+            @RequestParam("direction") String direction) {
         try {
-            SenderBookDTO bookDTO = bookService.findBooksPreviousPage(cursor, limit);
-            return ResponseEntity.ok(bookDTO);
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @GetMapping("/nextpage")
-    public ResponseEntity<SenderBookDTO> findBooksNextPage(
-            @RequestParam("cursor") String cursor,
-            @RequestParam("limit") int limit
-    ) {
-        try {
-            SenderBookDTO bookDTO = bookService.findBooksNextPage(cursor, limit);
+            SenderBookDTO bookDTO = bookService.findBooksPage(cursor, limit, direction);
             return ResponseEntity.ok(bookDTO);
 
         } catch (Exception e) {

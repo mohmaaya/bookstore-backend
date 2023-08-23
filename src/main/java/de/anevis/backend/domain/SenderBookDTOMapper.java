@@ -5,7 +5,7 @@ import java.util.List;
 
 
 @Component
-public class SenderBookDTOMapper implements CustomQuadFunction<List<Book>, Integer, List<Book> , List<Book>, SenderBookDTO> {
+public class SenderBookDTOMapper implements CustomFunction<List<Book>, Integer, List<Book> , List<Book>, SenderBookDTO> {
 
 
     @Override
@@ -13,18 +13,18 @@ public class SenderBookDTOMapper implements CustomQuadFunction<List<Book>, Integ
 
         String nextPageCursor = "";
         String previousPageCursor = "";
+
+
         if(nextPageBooks.isEmpty() && prevPageBooks.isEmpty() && books.size() > limit){
             nextPageCursor = CursorEncode.encodeId(books.get(books.size() - 1).getId());
-            books.remove(books.size() - 1);
+            books.remove(books.size()-1);
         }
-        if (!nextPageBooks.isEmpty() &&
-                nextPageBooks.size() > limit) {
-             nextPageCursor = CursorEncode.encodeId(nextPageBooks.get(nextPageBooks.size() - 1).getId());
-            books.remove(books.size() - 1);
+        if (!nextPageBooks.isEmpty() && nextPageBooks.size() >= limit + 1) {
+            nextPageCursor = CursorEncode.encodeId(nextPageBooks.get(limit).getId());
+        }
 
-        }
-        if(!prevPageBooks.isEmpty() && prevPageBooks.size() > limit){
-            previousPageCursor = CursorEncode.encodeId(prevPageBooks.get(0).getId());
+        if(!prevPageBooks.isEmpty()){
+            previousPageCursor = CursorEncode.encodeId(books.get(0).getId());
         }
 
         return new SenderBookDTO(books, new Cursors(nextPageCursor, previousPageCursor));

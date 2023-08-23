@@ -26,19 +26,25 @@ public class BookService {
 		return senderBookDTOMapper.apply(books,10, Collections.emptyList(), Collections.emptyList());
 	}
 
-	public SenderBookDTO findBooksNextPage(String nextCursor, int limit){
-		long cursorId = CursorEncode.decodeCursor(nextCursor);
-		List<Book> nextPageBooks = bookRepository.nextPageFindBooks(cursorId, limit+1);
-		List<Book> previousPageBooks = bookRepository.previousPageFindBooks(cursorId,limit);
-		return senderBookDTOMapper.apply(nextPageBooks, limit, nextPageBooks, previousPageBooks);
+	public SenderBookDTO findBooksPage(String cursor, int limit, String direction) {
+		Long cursorId = CursorEncode.decodeCursor(cursor);
+		List<Book> books = null;
+		List<Book> nextPageBooks = null;
+		List<Book> previousPageBooks = null;
+
+		if (PaginationDirection.NEXT_PAGE.toString().equals(direction)) {
+			books = bookRepository.nextPageFindBooks(cursorId, limit);
+			nextPageBooks = bookRepository.nextPageFindBooks(cursorId, limit + 1);
+			previousPageBooks = bookRepository.previousPageFindBooks(books.get(0).getId(), limit);
+		} else if (PaginationDirection.PREVIOUS_PAGE.toString().equals(direction)) {
+			books = bookRepository.previousPageFindBooks(cursorId, limit);
+			nextPageBooks = bookRepository.nextPageFindBooks(books.get(0).getId(), limit + 1);
+			previousPageBooks = bookRepository.previousPageFindBooks(books.get(0).getId(), limit);
+		}
+		return senderBookDTOMapper.apply(books, limit, nextPageBooks, previousPageBooks);
+
 	}
 
-	public SenderBookDTO findBooksPreviousPage(String nextCursor, int limit){
-		long cursorId = CursorEncode.decodeCursor(nextCursor);
-		List<Book> nextPageBooks = bookRepository.nextPageFindBooks(cursorId, limit+1);
-		List<Book> previousPageBooks = bookRepository.previousPageFindBooks(cursorId,limit);
-		return senderBookDTOMapper.apply(previousPageBooks, limit, nextPageBooks, previousPageBooks);
-	}
 
 	public Book updateBook(Long bookId, Book updatedBook) {
 		Optional<Book> optionalBook = bookRepository.findById(bookId);
