@@ -34,110 +34,59 @@ public class BookService {
 		this.cursorManager = cursorManager;
 	}
 
-	public SenderBookDTO findAllBooks(){
-		int initialLimit = 10;
-		long initialCursor = -1;
-		String initialDirection = "";
-		Pages pages = currentPageStrategy.calculatePagination(initialCursor, initialLimit);
-		System.out.println(pages.getCurrentPageBooks());
-		Cursors cursors = cursorManager.calculateCursors(pages, 10, "");
-		return senderBookDTOMapper.apply(pages.getCurrentPageBooks(),
-				cursors,
-				initialLimit,
-				initialDirection);
-	}
-
-	public SenderBookDTO findBooksPage(String currentCursor, int limit, String direction) {
-		Long cursorId = CursorEncode.decodeCursor(currentCursor);
-		PaginationStrategy paginationStrategy = PaginationDirection.NEXT_PAGE.toString().equals(direction) ?
-				nextPageStrategy : previousPageStrategy;
-
-		Pages pages = paginationStrategy.calculatePagination(cursorId, limit);
-		Cursors cursors = cursorManager.calculateCursors(pages, limit, currentCursor);
-		return senderBookDTOMapper.apply(pages.getCurrentPageBooks(), cursors, limit, direction);
-
-	}
-
-	public SenderBookDTO addBook(ReceiverBookDTO receiverBookDTO)  {
-		boolean bookExists = bookRepository
-				.selectBookExists(receiverBookDTO.book().getTitle(), receiverBookDTO.book().getAuthorName());
-		if (bookExists) {
-			throw new DuplicateBookException("Book with same title " + receiverBookDTO.book().getTitle() + " and author " + receiverBookDTO.book().getAuthorName() + " present");
-		}
-		bookRepository.save(receiverBookDTO.book());
-
-		Long cursorId = receiverBookDTO.cursor().getCurrentCursor().isEmpty() ?
-				-1 :
-				CursorEncode.decodeCursor(receiverBookDTO.cursor().getCurrentCursor());
-
-		PaginationStrategy paginationStrategy;
-
-		if(receiverBookDTO.direction().equals(PaginationDirection.NEXT_PAGE.toString()))
-			paginationStrategy = nextPageStrategy;
-		else if(receiverBookDTO.direction().equals(PaginationDirection.PREVIOUS_PAGE.toString()))
-			paginationStrategy = previousPageStrategy;
-		else paginationStrategy = currentPageStrategy;
-
-		Pages pages = paginationStrategy.calculatePagination(cursorId, receiverBookDTO.limit());
-		Cursors cursors = cursorManager.calculateCursors(pages, receiverBookDTO.limit(), receiverBookDTO.cursor().getCurrentCursor());
-		return senderBookDTOMapper.apply(pages.getCurrentPageBooks(), cursors, receiverBookDTO.limit(), receiverBookDTO.direction());
-
-	}
-
-	public SenderBookDTO updateBook(Long bookId, ReceiverBookDTO receiverBookDTO) {
-		Optional<Book> toUpdateBook = bookRepository.findById(bookId);
-		Optional<Boolean> duplicateBook = Optional.of(bookRepository.selectBookExists(receiverBookDTO.book().getTitle(), receiverBookDTO.book().getAuthorName()));
-		if (toUpdateBook.isPresent() && !duplicateBook.orElse(false)) {
-			Book existingBook = toUpdateBook.get();
-			existingBook.setTitle(receiverBookDTO.book().getTitle());
-			existingBook.setAuthorName(receiverBookDTO.book().getAuthorName());
-			existingBook.setFirstPublishYear(receiverBookDTO.book().getFirstPublishYear());
-			existingBook.setNumberOfPagesMedian(receiverBookDTO.book().getNumberOfPagesMedian());
-			existingBook.setCovers(receiverBookDTO.book().getCovers());
-
-			bookRepository.save(existingBook);
-			Long cursorId = receiverBookDTO.cursor().getCurrentCursor().isEmpty() ?
-					-1 :
-					CursorEncode.decodeCursor(receiverBookDTO.cursor().getCurrentCursor());
-
-			PaginationStrategy paginationStrategy;
-
-			if(receiverBookDTO.direction().equals(PaginationDirection.NEXT_PAGE.toString()))
-				paginationStrategy = nextPageStrategy;
-			else if(receiverBookDTO.direction().equals(PaginationDirection.PREVIOUS_PAGE.toString()))
-				paginationStrategy = previousPageStrategy;
-			else paginationStrategy = currentPageStrategy;
-
-			Pages pages = paginationStrategy.calculatePagination(cursorId, receiverBookDTO.limit());
-			Cursors cursors = cursorManager.calculateCursors(pages, receiverBookDTO.limit(), receiverBookDTO.cursor().getCurrentCursor());
-			return senderBookDTOMapper.apply(pages.getCurrentPageBooks(), cursors, receiverBookDTO.limit(), receiverBookDTO.direction());
-
-		}
-			throw new BookNotFoundException("Book with id: " + bookId + " not found");
-	}
-
-	public SenderBookDTO deleteBook(Long bookId, String cursor, int limit, String direction) {
-
-		if(!bookRepository.existsById(bookId)) {
-			throw new BookNotFoundException("Book with id: " + bookId + " not found");
-		}
-
-		 bookRepository.deleteById(bookId);
-
+	public SenderBookDTO findAllBooks(String cursor, Integer limit, String direction, String title, Integer year) {
 		Long cursorId = cursor.isEmpty() ?
-				-1 :
+				null :
 				CursorEncode.decodeCursor(cursor);
 
 		PaginationStrategy paginationStrategy;
 
-		if(PaginationDirection.NEXT_PAGE.toString().equals(direction))
+		if (PaginationDirection.NEXT_PAGE.toString().equals(direction))
 			paginationStrategy = nextPageStrategy;
-		else if(PaginationDirection.PREVIOUS_PAGE.toString().equals(direction))
+		else if (PaginationDirection.PREVIOUS_PAGE.toString().equals(direction))
 			paginationStrategy = previousPageStrategy;
 		else paginationStrategy = currentPageStrategy;
 
-		Pages pages = paginationStrategy.calculatePagination(cursorId, limit);
+		Pages pages = paginationStrategy.calculatePagination(cursorId, limit, title, year);
 		Cursors cursors = cursorManager.calculateCursors(pages, limit, cursor);
-		return senderBookDTOMapper.apply(pages.getCurrentPageBooks(), cursors, limit, direction);
+		return senderBookDTOMapper.apply(pages.getCurrentPageBooks(),
+				cursors,
+				limit,
+				direction);
+	}
+
+	public void addBook(Book book) {
+		boolean bookExists = bookRepository
+				.selectBookExists(book.getTitle(), book.getAuthorName());
+		if (bookExists) {
+			throw new DuplicateBookException("Book with same title " + book.getTitle() + " and author " + book.getAuthorName() + " present");
+		}
+		bookRepository.save(book);
+	}
+
+	public void updateBook(Long bookId, Book book) {
+		Optional<Book> toUpdateBook = bookRepository.findById(bookId);
+		Optional<Boolean> duplicateBook = Optional.of(bookRepository.selectBookExists(book.getTitle(), book.getAuthorName()));
+		if (toUpdateBook.isPresent() && !duplicateBook.orElse(false)) {
+			Book existingBook = toUpdateBook.get();
+			existingBook.setTitle(book.getTitle());
+			existingBook.setAuthorName(book.getAuthorName());
+			existingBook.setFirstPublishYear(book.getFirstPublishYear());
+			existingBook.setNumberOfPagesMedian(book.getNumberOfPagesMedian());
+			existingBook.setCovers(book.getCovers());
+
+			bookRepository.save(existingBook);
+		}
+		else throw new BookNotFoundException("Book with id: " + bookId + " not found");
+	}
+
+	public void deleteBook(Long bookId) {
+
+		if (!bookRepository.existsById(bookId)) {
+			throw new BookNotFoundException("Book with id: " + bookId + " not found");
+		}
+
+		bookRepository.deleteById(bookId);
+
 	}
 }

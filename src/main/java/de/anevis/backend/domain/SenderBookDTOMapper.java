@@ -4,19 +4,19 @@ import de.anevis.backend.pagination.CursorEncode;
 import de.anevis.backend.pagination.Cursors;
 import org.springframework.stereotype.Component;
 import java.util.List;
+import java.util.Optional;
 
 
 @Component
-public class SenderBookDTOMapper implements CustomFunction<List<Book>,
-       Cursors,
-       Integer,
-        String,
-        SenderBookDTO> {
-
-
+public class SenderBookDTOMapper implements CustomFunction<
+            List<Book>,
+            Cursors,
+            Integer,
+            String,
+            SenderBookDTO> {
     @Override
     public SenderBookDTO apply(List<Book> currentPageBooks,
-                              Cursors cursors,
+                               Cursors cursors,
                                Integer limit,
                                String direction) {
 

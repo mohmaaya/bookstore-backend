@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import java.util.Base64;
 
 public class CursorEncode {
-    public static String encodeId(long id) {
+    public static String encodeId(Long id) {
         return Base64.getEncoder().encodeToString(ByteBuffer.allocate(8).putLong(id).array());
     }
 

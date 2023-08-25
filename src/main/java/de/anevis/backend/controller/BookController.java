@@ -1,6 +1,6 @@
 package de.anevis.backend.controller;
 
-import de.anevis.backend.domain.ReceiverBookDTO;
+import de.anevis.backend.domain.Book;
 import de.anevis.backend.domain.SenderBookDTO;
 import de.anevis.backend.exception.BookNotFoundException;
 import de.anevis.backend.exception.DuplicateBookException;
@@ -8,6 +8,7 @@ import de.anevis.backend.service.BookService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/books")
@@ -20,74 +21,58 @@ public class BookController {
     }
 
     @GetMapping
-    public ResponseEntity<SenderBookDTO> findAllBooks() {
+    public ResponseEntity<SenderBookDTO> findAllBooks(
+            @RequestParam(value = "cursor", required = false, defaultValue = "") String cursor,
+            @RequestParam(value = "limit", required = false, defaultValue = "10") Integer limit,
+            @RequestParam(value = "direction", required = false) String direction,
+            @RequestParam(value = "title", required = false) String title,
+            @RequestParam(value = "year", required = false) Integer year
+    ) {
         try {
-            SenderBookDTO bookDTO = bookService.findAllBooks();
+            SenderBookDTO bookDTO = bookService.findAllBooks(cursor, limit, direction, title, year);
             return ResponseEntity.ok(bookDTO);
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    @GetMapping("/page")
-    public ResponseEntity<SenderBookDTO> findBooksPreviousPage(
-            @RequestParam("cursor") String cursor,
-            @RequestParam("limit") int limit,
-            @RequestParam("direction") String direction) {
-        try {
-            SenderBookDTO bookDTO = bookService.findBooksPage(cursor, limit, direction);
-            return ResponseEntity.ok(bookDTO);
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
 
     @PostMapping
-    public ResponseEntity<?> addBook(@RequestBody ReceiverBookDTO receiverBookDTO) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addBook(@RequestBody Book book) {
         try {
-            SenderBookDTO addedBook = bookService.addBook(receiverBookDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(addedBook);
+            bookService.addBook(book);
 
         } catch (DuplicateBookException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", e);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateBook(@PathVariable("id") Long id, @RequestBody ReceiverBookDTO receiverBookDTO) {
+    public void updateBook(@PathVariable("id") Long id, @RequestBody Book book) {
         try {
-            SenderBookDTO updated = bookService.updateBook(id, receiverBookDTO);
-                return ResponseEntity.ok(updated);
+             bookService.updateBook(id, book);
 
         } catch (BookNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", e);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBook(
-            @PathVariable("id") Long id,
-            @RequestParam("cursor") String cursor,
-            @RequestParam("limit") int limit,
-            @RequestParam("direction") String direction) {
+    public void deleteBook(
+            @PathVariable("id") Long id) {
 
         try {
-            SenderBookDTO bookRemoval = bookService.deleteBook(id, cursor, limit, direction);
-            return ResponseEntity.ok(bookRemoval);
+            bookService.deleteBook(id);
 
         } catch (BookNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", e);
         }
     }
 

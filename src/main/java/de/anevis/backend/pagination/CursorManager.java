@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CursorManager {
 
-    public Cursors calculateCursors(Pages pages, int limit, String currentCursor){
+    public Cursors calculateCursors(Pages pages, Integer limit, String currentCursor){
 
         String nextPageCursor = "";
         String previousPageCursor = "";
@@ -15,10 +15,7 @@ public class CursorManager {
             nextPageCursor = CursorEncode.encodeId(pages.getCurrentPageBooks().
                                get(pages.getCurrentPageBooks().size() - 1).getId());
             pages.getCurrentPageBooks().remove(pages.getCurrentPageBooks().size()-1);
-
-
         }
-
 
         if (!pages.getNextPageBooks().isEmpty() &&
                 pages.getNextPageBooks().size() >= limit + 1) {

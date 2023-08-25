@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+
 @Component
 public class CurrentPageStrategy implements PaginationStrategy {
 
@@ -18,11 +20,15 @@ public class CurrentPageStrategy implements PaginationStrategy {
 
 
     @Override
-    public Pages calculatePagination(Long cursorId, int limit) {
+    public Pages calculatePagination( Long cursorId,
+                                      Integer limit,
+                                      String title,
+                                      Integer year) {
         List<Book> currentPageBooks;
         List<Book> nextPageBooks = Collections.emptyList();
         List<Book> previousPageBooks = Collections.emptyList();
-        currentPageBooks = bookRepository.noCursorFindBooks(limit+1);
+
+        currentPageBooks = bookRepository.noCursorFindBooks(title, year, limit+1);
         return new Pages(currentPageBooks, nextPageBooks, previousPageBooks);
     }
 }

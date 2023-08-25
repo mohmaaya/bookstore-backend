@@ -1,9 +1,9 @@
 package de.anevis.backend.pagination;
 
 public class Cursors {
-    private String nextCursor;
-    private String previousCursor;
-    private String currentCursor;
+    private final String nextCursor;
+    private final String previousCursor;
+    private final String currentCursor;
 
     public Cursors(String nextCursor, String previousCursor, String currentCursor){
         this.nextCursor = nextCursor;
