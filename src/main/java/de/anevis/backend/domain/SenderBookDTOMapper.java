@@ -1,10 +1,8 @@
 package de.anevis.backend.domain;
 
-import de.anevis.backend.pagination.CursorEncode;
 import de.anevis.backend.pagination.Cursors;
 import org.springframework.stereotype.Component;
 import java.util.List;
-import java.util.Optional;
 
 
 @Component

@@ -17,8 +17,8 @@ public class CursorManager {
             pages.getCurrentPageBooks().remove(pages.getCurrentPageBooks().size()-1);
         }
 
-        if (!pages.getNextPageBooks().isEmpty() &&
-                pages.getNextPageBooks().size() >= limit + 1) {
+        if (pages.getBooksAvailable()>0){
+
             nextPageCursor = CursorEncode.encodeId(pages.getNextPageBooks().get(limit).getId());
         }
 

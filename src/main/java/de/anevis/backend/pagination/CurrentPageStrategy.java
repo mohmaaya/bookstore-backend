@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class CurrentPageStrategy implements PaginationStrategy {
@@ -25,10 +24,8 @@ public class CurrentPageStrategy implements PaginationStrategy {
                                       String title,
                                       Integer year) {
         List<Book> currentPageBooks;
-        List<Book> nextPageBooks = Collections.emptyList();
-        List<Book> previousPageBooks = Collections.emptyList();
 
         currentPageBooks = bookRepository.noCursorFindBooks(title, year, limit+1);
-        return new Pages(currentPageBooks, nextPageBooks, previousPageBooks);
+        return new Pages(currentPageBooks, Collections.emptyList(), Collections.emptyList(), 0);
     }
 }

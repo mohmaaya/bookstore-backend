@@ -36,7 +36,7 @@ public class BookService {
 
 	public SenderBookDTO findAllBooks(String cursor, Integer limit, String direction, String title, Integer year) {
 		Long cursorId = cursor.isEmpty() ?
-				null :
+				0L :
 				CursorEncode.decodeCursor(cursor);
 
 		PaginationStrategy paginationStrategy;
@@ -64,11 +64,19 @@ public class BookService {
 		bookRepository.save(book);
 	}
 
-	public void updateBook(Long bookId, Book book) {
+	public Book updateBook(Long bookId, Book book) {
 		Optional<Book> toUpdateBook = bookRepository.findById(bookId);
-		Optional<Boolean> duplicateBook = Optional.of(bookRepository.selectBookExists(book.getTitle(), book.getAuthorName()));
-		if (toUpdateBook.isPresent() && !duplicateBook.orElse(false)) {
+		Optional<Book> duplicateBook = bookRepository.findBook(book.getTitle(), book.getAuthorName());
+		if (toUpdateBook.isEmpty()) {
+			throw new BookNotFoundException("Book with "+ bookId + " not found");
+		}
+		if (toUpdateBook.isPresent() &&
+				duplicateBook.isPresent() &&
+				!duplicateBook.get().getId().equals(bookId)) {
+			throw new DuplicateBookException("Book with same title and author exists");
+		}
 			Book existingBook = toUpdateBook.get();
+
 			existingBook.setTitle(book.getTitle());
 			existingBook.setAuthorName(book.getAuthorName());
 			existingBook.setFirstPublishYear(book.getFirstPublishYear());
@@ -76,8 +84,8 @@ public class BookService {
 			existingBook.setCovers(book.getCovers());
 
 			bookRepository.save(existingBook);
-		}
-		else throw new BookNotFoundException("Book with id: " + bookId + " not found");
+			return existingBook;
+
 	}
 
 	public void deleteBook(Long bookId) {
