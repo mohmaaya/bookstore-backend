@@ -1,0 +1,8 @@
+The backend of the application, is developed using Java and Spring Boot. The Controller class serves as the interface between the client-side and the server-side, containing four methods for mapping REST APIs
+1. `FindAllBooks()`: This GET mapping method retrieves all book data and efficiently incorporates fetching books using various filters. Combining these filters into a single method reduces code duplication.
+2. `addBook()`: For POST mapping, this method handles the addition of new books to the database.
+3. `updateBook()`: This PUT mapping method allows for the update of book details.
+4. `deleteBook()`: With DELETE mapping, this method facilitates the removal of a book from the database.
+<br>
+For Pagination, I've implemented Cursor-based pagination using the Strategy pattern. Depending on the direction of pages, a specific implementation of the PaginationStrategy interface is invoked. The logic for calculating next/previous/current page books, as well as determining new cursors, varies based on the page direction. This approach streamlines code organization.
+The fundamental concept behind pagination is calculating the next cursor using the current cursor and the selected page limit (number of books per page). To find the next cursor, the logic identifies the book exceeding the limit, and its ID becomes the next cursor. IDs are encoded when sent to the client and decoded upon receipt. A similar approach is applied to determine the previous cursor. I've implemented handling for edge cases, such as fewer books available than the set limit, and for proper handling of first and last pages. Additional filters, like title and publish year, are incorporated into queries as optional parameters.
