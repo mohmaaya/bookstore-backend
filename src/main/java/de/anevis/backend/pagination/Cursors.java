@@ -11,13 +11,9 @@ public class Cursors {
         this.currentCursor = currentCursor;
     }
 
-    public String getNextCursor() {
-        return nextCursor;
-    }
+    public String getNextCursor() {return nextCursor;}
 
-    public String getPreviousCursor() {
-        return previousCursor;
-    }
+    public String getPreviousCursor() {return previousCursor;}
 
     public String getCurrentCursor() { return currentCursor;}
 }

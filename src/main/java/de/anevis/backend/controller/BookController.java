@@ -48,7 +48,7 @@ public class BookController {
         } catch (DuplicateBookException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage(), e);
         } catch (Exception e) {
-            e.printStackTrace();
+
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", e);
         }
     }
@@ -60,10 +60,10 @@ public class BookController {
             return ResponseEntity.ok(updatedBook);
 
         } catch (BookNotFoundException e) {
-            e.printStackTrace();
+
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }catch (DuplicateBookException e) {
-            e.printStackTrace();
+
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage(), e);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", e);

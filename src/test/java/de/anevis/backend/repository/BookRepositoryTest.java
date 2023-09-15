@@ -3,7 +3,6 @@ package de.anevis.backend.repository;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.anevis.backend.domain.Book;
-import de.anevis.backend.repository.BookRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;

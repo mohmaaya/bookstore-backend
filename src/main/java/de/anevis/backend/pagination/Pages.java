@@ -6,10 +6,10 @@ import java.util.List;
 
 public class Pages {
 
-    private List<Book> currentPageBooks;
-    private List<Book> nextPageBooks;
-    private List<Book> previousPageBooks;
-    Integer booksAvailable;
+    private final List<Book> currentPageBooks;
+    private final List<Book> nextPageBooks;
+    private final List<Book> previousPageBooks;
+    private final Integer booksAvailable;
 
 
     public Pages(List<Book> currentPageBooks,

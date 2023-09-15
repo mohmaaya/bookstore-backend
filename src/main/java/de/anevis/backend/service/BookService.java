@@ -7,7 +7,6 @@ import de.anevis.backend.pagination.*;
 import de.anevis.backend.repository.BookRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.Optional;
 
 @Service
